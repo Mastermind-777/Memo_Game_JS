@@ -1,0 +1,78 @@
+const cards = document.querySelectorAll(".memo_card");
+
+let hasFlippedCard = false;
+let boardLocked = false;
+let firstCard, secondCard;
+let button = document.querySelector('button'); //button
+
+button.onclick = function() {
+  location.reload();
+  return false;
+}
+
+const flipCard = e => {
+  if (boardLocked) return;
+
+  const target = e.target.parentElement;
+
+  if (target === firstCard) return;
+
+  target.classList.add("flip");
+
+  // console.log("FRAMEWORK OF CURRENT CARD", target.dataset.framework);
+
+  if (!hasFlippedCard) {
+    //  First click
+
+    hasFlippedCard = true;
+    firstCard = target;
+  } else {
+     //  Second click
+
+    hasFlippedCard = false;
+    secondCard = target;
+
+    //  Check for match
+    checkForMatch();
+  }
+};
+
+const checkForMatch = () => {
+  const isEqual = firstCard.dataset.framework === secondCard.dataset.framework;
+
+  isEqual ? disableCards() : unflipCards();
+};
+
+const disableCards = () => {
+  firstCard.removeEventListener("click", flipCard);
+  secondCard.removeEventListener("click", flipCard);
+};
+
+const unflipCards = () => {
+  boardLocked = true;
+
+  setTimeout(() => {
+    firstCard.classList.remove("flip");
+    secondCard.classList.remove("flip");
+
+    resetBoard();
+  }, 1000);
+};
+
+const resetBoard = () => {
+  // Too heavy  SPREAD
+  // [hasFlippedCard, boardLocked] = [false, false];
+  // [firstCard, secondCard] = [null, null];
+
+  //Better  Double insertation
+  hasFlippedCard = boardLocked = false;
+  firstCard = secondCard = null;
+};
+
+cards.forEach(card => {
+  // Add Event Listener to every card
+  card.addEventListener("click", flipCard);
+
+  const randomIndex = Math.floor(Math.random() * cards.length);
+  card.style.order = randomIndex;
+});
